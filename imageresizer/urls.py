@@ -1,6 +1,8 @@
 from django.urls import path
-from imageresizer import views
+from .views import ResizeImageView, UploadedImageView, UserVisitView
 
 urlpatterns = [
-    path('resizeimage/', views.ResizeImageView.as_view(), name='resizeimage'),
+    path('resizeimage/', ResizeImageView.as_view(), name='resizeimage'),
+    path('uploadimage/', UploadedImageView.as_view(), name='uploadimage'),
+    path('trackuser/', UserVisitView.as_view(), name='trackuser'),
 ]
