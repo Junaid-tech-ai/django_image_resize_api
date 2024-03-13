@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import UserVisit, ImageModel
 
 
 class ImageSerializer(serializers.Serializer):
@@ -22,3 +23,19 @@ class ImageSerializer(serializers.Serializer):
             elif image_format.lower() == 'png':
                 data['format'] = 'PNG'
         return data
+
+
+class UserVisitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserVisit
+        fields = '__all__'
+
+
+class ImageModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageModel
+        fields = ['title', 'image']  # Add other fields if necessary
+
+    # If additional validation or customization is needed, you can override the create method
+    def create(self, validated_data):
+        return ImageModel.objects.create(**validated_data)
