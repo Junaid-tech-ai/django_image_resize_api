@@ -1,28 +1,26 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from PIL import Image
-import io
-from django.http import JsonResponse
-from .serializer import ImageSerializer, UserVisitSerializer, ImageModelSerializer
-import requests
 import base64
-from django.shortcuts import render, redirect
+import geoip2.database
+import io
+import requests
+
+from PIL import Image
 from django.contrib.auth import authenticate, login
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth
-from .models import UserVisit, ImageModel
-# from django.contrib.gis.geoip2 import GeoIP2
-import geoip2.database
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 from django.utils import timezone
-import calendar
-import os
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import ImageModel, UserVisit
+from .serializer import ImageModelSerializer, ImageSerializer, UserVisitSerializer
 
 
 class ResizeImageView(APIView):
     def post(self, request, format=None):
         serializer = ImageSerializer(data=request.data)
-        print(serializer, "before ....................")
         if serializer.is_valid():
             print("inside valid function", serializer)
             image_data = serializer.validated_data['image'].read()
@@ -40,19 +38,12 @@ class ResizeImageView(APIView):
             # crop_bottom = serializer.validated_data.get('crop_bottom')
 
             img = Image.open(io.BytesIO(image_data))
-            print("image open", img)
-
-            # if crop_left is not None and crop_top is not None and crop_right is not None and crop_bottom is not None:
-            #     img = img.crop((crop_left, crop_top, crop_right, crop_bottom))
 
             if width_px and height_px:
                 width_data = width_px
                 height_data = height_px
-            # elif width_cm and height_cm:
-            #     width_data = int(width_cm * 37.7952755906)
-            #     height_data = int(height_cm * 37.7952755906)
             else:
-                return Response({"error": "Provide either pixel scale or centimeter scale for width and height"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Provide either pixel for width and height"}, status=status.HTTP_400_BAD_REQUEST)
 
             resize_image = img.resize((width_data, height_data))
             print(resize_image, "resize image....")
@@ -85,8 +76,6 @@ class ResizeImageView(APIView):
             headers = {
                'Authorization': token
             }
-            print('befor API call')
-
             try:
                 response = requests.post(url, data=data, headers=headers)
 
@@ -116,10 +105,8 @@ class ResizeImageView(APIView):
                     else:
                         print("Error saving user visit data:", user_visit_serializer.errors)
                     return response
-                # Print the response content
 
                 else:
-                    # If the request was not successful, print the error status code
                     print("API Error:", response.status_code)
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
@@ -135,7 +122,6 @@ def login_view(request):
             login(request, user)
             return redirect('dashboard')
         else:
-            # Handle invalid login
             return render(request, 'core/login.html', {'error': 'Invalid username or password'})
     else:
         return render(request, 'core/login.html')
@@ -158,7 +144,7 @@ def admin_dashboard(request):
         # Logic to retrieve data for the admin dashboard
         user_visit_count = UserVisit.objects.count()
         image_count = ImageModel.objects.count()
-     
+
         # Logic to retrieve country-wise visit counts
         country_visit_counts = {}
         print(country_visit_counts, "country wise counts")
@@ -176,7 +162,6 @@ def admin_dashboard(request):
         country_data = list(country_visit_counts.values())
         print(country_data, "country data")
 
-    
         # Logic to retrieve monthly visit counts for the current year
         current_year = timezone.now().year
         monthly_visit_counts = UserVisit.objects.filter(timestamp__year=current_year).annotate(
@@ -188,10 +173,8 @@ def admin_dashboard(request):
         # Prepare data for the monthly user visits chart
         # month_labels = [f"{calendar.month_name[count['month']]} {current_year}" for count in monthly_visit_counts]
         month_labels = ["Jan", "Feb", "Mar", "Apr"]
-        print(month_labels, "month labels")
         # month_data = [count['visit_count'] for count in monthly_visit_counts]
         month_data = [15, 10, 25, 12]
-        print(month_data, "month data")
 
         context = {
             'user_visit_count': user_visit_count,
@@ -200,7 +183,6 @@ def admin_dashboard(request):
             'country_data': country_data,
             'month_labels': month_labels,
             'month_data': month_data,
-            # Other data for the admin dashboard
         }
         return render(request, 'core/dashboard.html', context)
     else:
