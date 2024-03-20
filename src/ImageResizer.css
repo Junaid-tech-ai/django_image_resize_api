@@ -1,0 +1,53 @@
+/* ImageResizer.css */
+
+/* Light mode styles */
+.container {
+  background-color: #ffffff;
+  color: #000000;
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for color changes */
+}
+
+.container:hover {
+  /* Define hover styles for light mode */
+  /* Example: Add a subtle shadow effect on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Change font color for specific elements */
+.container h1 {
+  color: #c87810; /* Change heading color */
+}
+
+.container p {
+  color: #ac1984; /* Change paragraph text color */
+}
+
+/* Target the "Drag & drop" text */
+.dropzone p.drag-drop-text {
+  color: #777777; /* Change font color for the "Drag & drop" text */
+}
+
+/* Dark mode styles */
+.dark-mode .container {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.dark-mode .container:hover {
+  /* Define hover styles for dark mode */
+  /* Add your dark mode hover styles here */
+}
+
+.dropzone .text-muted {
+  color: #a02398; /* Change font color for text-muted elements in dark mode */
+}
+
+
+/* Adjust font color for specific elements in dark mode */
+.dark-mode .container .text-muted {
+  color: #ffffff; /* Change font color for text-muted elements in dark mode */
+}
+
+.dark-mode .container .text-muted.drag-drop-text {
+  color: #dddddd; /* Change font color for the "Drag & drop" text in dark mode */
+}
